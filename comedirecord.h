@@ -64,6 +64,8 @@ public:
 /**
  * Sets the filename for the data-file
  **/
+	
+	int LEDs_Mode;
 	void setFilename(QString fn,int csv);
 
 public:
@@ -154,6 +156,13 @@ public:
      **/
     QPushButton *filePushButton;
 
+    /**
+       button fot LEDs
+    **/
+    QPushButton *LED_Button;
+ 
+   
+
  private:
     /**
      * Button: Increase the time between samples
@@ -200,6 +209,10 @@ private slots:
      * Enter a new filename
      **/
     void enterFileName();
+   
+
+    void LED_Control();
+
 
     /**
      * Pressing or releasing the record button

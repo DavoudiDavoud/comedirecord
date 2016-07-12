@@ -314,6 +314,27 @@ ComediRecord::ComediRecord( QWidget *parent,
 		this, SLOT( enterFileName() ) );
 	recLayout->addWidget(filePushButton);
 
+
+
+
+
+
+
+	LEDs_Mode = 0;
+	LED_Button = new QPushButton( "LED OFF" );
+	LED_Button->setSizePolicy ( QSizePolicy(QSizePolicy::Fixed,
+						    QSizePolicy::Fixed ));
+	LED_Button->setStyleSheet(
+		"background-color: white;border-style:outset;border-width: 2px;border-color: black;font: bold 14px; padding: 0px;");
+	connect(LED_Button, SIGNAL( clicked() ),
+		this, SLOT(  LED_Control() ) );
+	recLayout->addWidget(LED_Button);
+
+
+
+
+
+
 	rawCheckbox=new QCheckBox("raw data" );
 	rawCheckbox->setChecked( false );
 	recLayout->addWidget(rawCheckbox);
@@ -501,6 +522,32 @@ void ComediRecord::enterFileName() {
                 setFilename(QString(fileName),isCSV>-1);
         }
 }
+
+
+
+
+
+
+
+void ComediRecord::LED_Control() {
+  LEDs_Mode = (LEDs_Mode +1)%2;
+  if (LEDs_Mode == 1)
+    {
+      LED_Button ->setText("LEDs ON");
+    }
+  else
+    {
+      LED_Button ->setText("LEDs OFF");
+    }
+
+
+	
+}
+
+
+
+
+
 
 // callback
 void ComediRecord::recstartstop(int) 

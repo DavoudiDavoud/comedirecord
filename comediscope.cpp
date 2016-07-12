@@ -593,7 +593,7 @@ void ComediScope::paintEvent( QPaintEvent * ) {
 		}
 		counter = counter + 1;
 
-		if(counter == 50){
+		if(counter == 100){
 			int ret3,ret4,ret5;
 			ret3 = comedi_dio_write(dev[0],2,ch,0);
 			if(ret3 < 0){
@@ -601,11 +601,13 @@ void ComediScope::paintEvent( QPaintEvent * ) {
 				exit(-1);
      			}
 			ch = (ch + 1)%2;
-			ret3 = comedi_dio_write(dev[0],2,ch,1);
-   			if(ret3 < 0){
- 		 		comedi_perror("turning on problem");
-			        exit(-1);
-     			}
+			if (comediRecord->LEDs_Mode == 1){
+			  ret3 = comedi_dio_write(dev[0],2,ch,1);
+			  if(ret3 < 0){
+			    comedi_perror("turning on problem");
+			    exit(-1);
+			  }
+			}
 			ret4 = comedi_get_buffer_offset(dev[0],0);
 			ret5 = comedi_get_buffer_contents(dev[0],0);	
 			ret3 = read(comedi_fileno(dev[0]),fake_buffer,1000);
