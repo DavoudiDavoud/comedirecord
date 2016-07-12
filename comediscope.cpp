@@ -31,9 +31,10 @@ ComediScope::ComediScope( ComediRecord *comediRecordTmp,
 			  int fftdevnumber, int fftchannel, int fftmaxf
 	)
     : QWidget( comediRecordTmp ) {
-
+  
 	channels_in_use = channels;
-
+	//channel!!!
+	ch = 0;
 	tb_init=1;
 	tb_counter=tb_init;
 	comediRecord=comediRecordTmp;
@@ -313,6 +314,8 @@ void ComediScope::setNotchFrequency(float f) {
 
 void ComediScope::updateTime() {
 	QString s;
+	//static int averager = 0;
+	//static float sum[2] = {0.0,0.0};
 	if (!rec_file) {
 		if (rec_filename->isEmpty()) {
 			s.sprintf("comedirecord");
@@ -340,6 +343,23 @@ void ComediScope::updateTime() {
 			comediRecord->voltageTextEdit[n][i]->setText(tmp);
 		}
 	}
+	//averager
+	/*avarager= averager +1;
+	sum[ch] = sum[ch] + comedi_to_phys(daqData[0][0],crange[0],maxdata[0]);
+
+	if (averager ==  10){
+	   sum[ch] = sum[ch] /1000;
+	   char tmp[256];
+	   sprintf(tmp,VOLT_FORMAT_STRING,sum[ch]);
+	   if (ch == 0){
+	     comediRecord->irsensorTextEdit->setText(tmp);
+	   }
+	   else{
+	     comediRecord->redsensorTextEdit->setText(tmp);
+	   }
+	   sum[ch] = 0;
+	   averager = 0;
+	   }*/
 }
 
 
@@ -513,8 +533,9 @@ void ComediScope::paintData(float** buffer) {
 
 void ComediScope::paintEvent( QPaintEvent * ) {
         int ret;	
-	static int counter = 0; 
-	static int ch = 0;
+	static int counter = 0;
+	static int averager = 0;
+	static float sum[2] = {0.0,0.0};
 	static unsigned char fake_buffer[10000];
 	while (1) {
 		// we need data in all the comedi devices
@@ -591,32 +612,47 @@ void ComediScope::paintEvent( QPaintEvent * ) {
 		if (comediRecord->recPushButton->checkState()==Qt::Checked) {
 			writeFile(ch,counter);
 		}
+		sum[ch] = sum[ch] + comedi_to_phys(daqData[0][0],crange[0],maxdata[0]);
 		counter = counter + 1;
+		averager = averager +1;
 
-		if(counter == 100){
-			int ret3,ret4,ret5;
-			ret3 = comedi_dio_write(dev[0],2,ch,0);
-			if(ret3 < 0){
- 		 		comedi_perror("turning off problem");
-				exit(-1);
-     			}
-			ch = (ch + 1)%2;
-			if (comediRecord->LEDs_Mode == 1){
-			  ret3 = comedi_dio_write(dev[0],2,ch,1);
-			  if(ret3 < 0){
-			    comedi_perror("turning on problem");
-			    exit(-1);
-			  }
-			}
-			ret4 = comedi_get_buffer_offset(dev[0],0);
-			ret5 = comedi_get_buffer_contents(dev[0],0);	
-			ret3 = read(comedi_fileno(dev[0]),fake_buffer,1000);
+		if(counter == 10){
+		 if (averager ==  70){
+		    sum[ch] = sum[ch]/70;
+		    char tmp[256];
+		    sprintf(tmp,VOLT_FORMAT_STRING,sum[ch]);
+		    if (ch == 0){
+		      comediRecord->redsensorTextEdit->setText(tmp);
+		    }
+		    else{
+		      comediRecord->irsensorTextEdit->setText(tmp);
+		    }
+		    sum[ch] = 0;
+		    averager = 0;
+		    }		    
+		  int ret3,ret4,ret5;
+		  ret3 = comedi_dio_write(dev[0],2,ch,0);
+		  if(ret3 < 0){
+		    comedi_perror("turning off problem");
+		    exit(-1);
+		  }
+		  ch = (ch + 1)%2;
+		  if (comediRecord->LEDs_Mode == 1){
+		    ret3 = comedi_dio_write(dev[0],2,ch,1);
+		    if(ret3 < 0){
+		      comedi_perror("turning on problem");
+		      exit(-1);
+		    }
+		  }
+		ret4 = comedi_get_buffer_offset(dev[0],0);
+		ret5 = comedi_get_buffer_contents(dev[0],0);	
+		ret3 = read(comedi_fileno(dev[0]),fake_buffer,1000);
 			
-			//ret3 = read(comedi_fileno(dev[0]),fake_buffer,comedi_get_buffer_contents(dev[0],subdevice));
-			counter = 0;
+		//ret3 = read(comedi_fileno(dev[0]),fake_buffer,comedi_get_buffer_contents(dev[0],subdevice));
+		counter = 0;
 			
 			
-			printf("available bytes:%10d	read bytes:%10d	offset:%10d\n",ret5,ret3,ret4);			
+		printf("available bytes:%10d	read bytes:%10d	offset:%10d\n",ret5,ret3,ret4);			
 			
 		}
 		

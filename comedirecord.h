@@ -115,6 +115,13 @@ public:
      * Array of the voltages
      **/
     QTextEdit***  voltageTextEdit;
+    QTextEdit*  irsensorTextEdit;
+    QTextEdit*  redsensorTextEdit;
+
+
+
+
+
 
     /**
      * Array for the gain settings

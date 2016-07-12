@@ -50,7 +50,9 @@ public:
  * Destructor: close the file if necessary
  **/
     ~ComediScope();
-
+    
+    //channel???
+    int ch;
 
 protected:
 /**

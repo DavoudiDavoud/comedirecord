@@ -272,6 +272,78 @@ ComediRecord::ComediRecord( QWidget *parent,
 	// the corresponding box which contains all the controls
 	QGroupBox *restGroup = new QGroupBox;
 
+
+
+
+
+
+
+	//Red and IR LEDs 
+	//create a group box for the the light sensor
+	QGroupBox* sensorGroupBox = new QGroupBox();
+	sensorGroupBox->setFlat(TRUE);
+	sensorGroupBox->setStyleSheet(styleSheet);
+	QHBoxLayout *sensorLayout = new QHBoxLayout();
+
+	//red and ir text
+	redsensorTextEdit=new QTextEdit(sensorGroupBox);
+	redsensorTextEdit->setStyleSheet(styleSheet);
+	irsensorTextEdit=new QTextEdit(sensorGroupBox);
+	irsensorTextEdit->setStyleSheet(styleSheet);	
+
+	
+
+
+	//labels
+	QLabel *redl=new QLabel("RED(dout0):");
+	QLabel *irl=new QLabel("IR(dout1) :");
+
+
+	//red Stuff
+	sensorLayout->addWidget(redl);
+	sensorLayout->addWidget(redsensorTextEdit);
+	redsensorTextEdit->setFont(voltageFont);
+	char tmpVolt[128];
+	sprintf(tmpVolt,
+    			" "VOLT_FORMAT_STRING" ",
+			comediScope->crange[0]->max);
+	redsensorTextEdit->setMaximumSize
+       			(voltageMetrics.width(tmpVolt),
+			 (int)(voltageMetrics.height()*1.1));
+	redsensorTextEdit->
+			setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff ); 
+	redsensorTextEdit->setReadOnly(TRUE);
+	redsensorTextEdit->setFont(voltageFont);
+ 
+	//IR stuff
+      	sensorLayout->addWidget(irl);
+	sensorLayout->addWidget(irsensorTextEdit);
+	irsensorTextEdit->setFont(voltageFont);
+	sprintf(tmpVolt,
+    			" "VOLT_FORMAT_STRING" ",
+			comediScope->crange[0]->max);
+	irsensorTextEdit->setMaximumSize
+       			(voltageMetrics.width(tmpVolt),
+			 (int)(voltageMetrics.height()*1.1));
+	irsensorTextEdit->
+			setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff ); 
+	irsensorTextEdit->setReadOnly(TRUE);
+	irsensorTextEdit->setFont(voltageFont);
+
+
+
+
+	//notchLayout->addWidget(commentTextEdit);
+       	sensorGroupBox->setLayout(sensorLayout);
+	restLayout->addWidget(sensorGroupBox);
+
+
+
+
+
+
+
+
 	// notch filter
 	// create a group for the notch filter
 	QGroupBox* notchGroupBox = new QGroupBox();
